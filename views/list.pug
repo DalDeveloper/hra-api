@@ -1,0 +1,75 @@
+extends layout
+
+block content
+ h1.text-center=title
+ table(cellpadding='3', cellspacing='0', border='0', style='margin: 40px auto 2em auto;')
+  thead
+    tr
+      th Target
+      th Search text
+  tbody
+    tr#filter_global
+      td Global search:
+      td(align='center')
+        input#global_filter.global_filter(type='text')
+    tr#filter_col1(data-column='1')
+      td Name:
+      td(align='center')
+        input#col1_filter.column_filter(type='text')
+    tr#filter_col2(data-column='6')
+      td Email:
+      td(align='center')
+         input#col6_filter.column_filter(type='text')
+    tr#filter_col3(data-column='10')
+      td Designation:
+      td(align='center')
+        input#col10_filter.column_filter(type='text')
+    tr#filter_col4(data-column='7')
+      td Mobile:
+      td(align='center')
+        input#col7_filter.column_filter(type='text')
+    tr#filter_col5(data-column='12')
+      td Salary:
+      td(align='center')
+        input#col12_filter.column_filter(type='text')
+    tr#filter_col6(data-column='14')
+      td Status:
+      td(align='center')
+        input#col14_filter.column_filter(type='text')
+
+ .table-responsive
+    table#datalist.table.table-striped.table-bordered
+     thead
+      tr
+       th empId
+       th Name
+       th Surname
+       th Gender
+       th(style='width:150px;') DOB
+       th(style='width:150px;') DOJ
+       th Email
+       th Mobile
+       th Address
+       th(style='width:150px;') Bl Grp.
+       th Designation
+       th Experience
+       th Salary
+       th PAN
+       th Status
+     tfoot
+      tr 
+       th empId
+       th Name
+       th Surname
+       th Gender
+       th(style='width:150px;') DOB
+       th(style='width:150px;') DOJ
+       th Email
+       th Mobile
+       th Address
+       th(style='width:150px;') Bl Grp.
+       th Designation
+       th Experience
+       th Salary
+       th PAN
+       th Status  

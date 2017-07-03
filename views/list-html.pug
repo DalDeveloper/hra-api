@@ -1,0 +1,39 @@
+extends layout
+
+block content
+ h1=title
+ .table-responsive
+    table#datalist.table.table-striped.table-bordered
+     thead
+      tr
+       th Id
+       th Name
+       th Surname
+       th(style='width:150px;') DOB
+       th(style='width:150px;') DOJ
+       th Email
+       th Mobile
+       th Address
+       th(style='width:150px;') Bl Grp.
+       th Designation
+       th Experience
+       th Salary
+       th PAN
+       th Status
+      tbody
+       for emp in data
+        tr
+         td=emp.empId
+         td=emp.name
+         td=emp.surname
+         td=emp.dob
+         td=emp.doj
+         td=emp.email
+         td=emp.mobile
+         td=emp.address
+         td=emp.bgroup
+         td=emp.designation
+         td=emp.exp
+         td=emp.salary
+         td=emp.pan_no
+         td=emp.status
