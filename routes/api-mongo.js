@@ -1,7 +1,8 @@
 module.exports = function(Employees){
     var express = require('express');
     var fs = require('fs');
-    var fsImpl = require('../aws'); console.log(fsImpl);
+    var fileUpload = require('express-fileupload');
+    var fsImpl = require('../aws');
     var multiparty = require('connect-multiparty');
     var multipartMiddleware = multiparty();
     var Employee = require('../modules/employees');
@@ -20,60 +21,40 @@ module.exports = function(Employees){
 
     // C = Create - This End point create a new employee.
 
-    router.post('/employees/', multipartMiddleware, function(req, res, next) {
+    router.post('/employees/', function(req, res, next) {
        
         var params = req.body; 
-       
-        // don't forget to delete all req.files when done
-        var profilepic = req.files.profilepic; 
+        if(params._id) delete params._id; //console.log(params);
+        if(params._$visited) delete params._$visited; //console.log(params);
         
-        if(profilepic){
-         
-          var stream = fs.createReadStream(profilepic.path);
-          var imageName = (params.name + '_' + params.surname + '.' + (profilepic.name).split('.').pop()).toLowerCase();
-          
-         fsImpl.writeFile(imageName, stream).then(function() {
-            fs.unlink(profilepic.path);	
-            //console.log('It\'s saved!');
-          }, function(reason) {
-            throw reason;
-          });
-        }
         params.empId = Math.floor((Math.random() * 1000) + 1);
-        params.image = imageName || ''; 
+        params.image = params.image || ''; 
         var Emp = new EmployeeModel(params);
             Emp.save(function(err,Employee) {
               if (err) throw err;
-                Employee.image = getImagePath + Employee.image;
+                //Employee.image = getImagePath + Employee.image;
                 res.json({data: Employee, message:'Employee saved successfully!', status: 200});
             });
     });
 
     // U = Update - This End point update an employee.
 
-    router.put('/employees/', multipartMiddleware, function(req, res, next) {
+    router.put('/employees/', function(req, res, next) { console.log(req.body);
        var params = req.body; 
-        // don't forget to delete all req.files when done
-        var profilepic = req.files.profilepic; 
-        
-        if(profilepic){
-         
-          var stream = fs.createReadStream(profilepic.path);
-          var imageName = (params.name + '_' + params.surname + '.' + (profilepic.name).split('.').pop()).toLowerCase();
-          params.image = imageName;
-         fsImpl.writeFile(imageName, stream).then(function() {
-            fs.unlink(profilepic.path);	
-            //console.log('It\'s saved!');
-          }, function(reason) {
-            throw reason;
-          });
-        }    
-         EmployeeModel.findByIdAndUpdate(params._id, { $set: params}, { new: true }, function (err, Employee) {
-          if (err) return handleError(err);
-          
-          if(Employee) res.status(200).json({data: Employee, message: 'Record updated successfully', status: 200});
-        });
-
+       var empId = params.empId;
+       if (isNaN(empId)) res.status(200).json({data: [], message:'Invalid Employee id', status: 200});
+       else {
+         EmployeeModel.findOneAndUpdate({empId: empId}, { $set: params}, { new: true }, function (err, Employee) {
+            if (err) return handleError(err);
+            if(Employee){
+              Employee.image = getImagePath + Employee.image;
+              res.status(200).json({data: Employee, message: 'Employee updated successfully', status: 200}); }
+            else{
+              res.status(200).json({data: {}, message: 'No record found', status: 200});
+            }  
+         });
+            
+        };
     });
 
     // R = Read - These two End points list employees or a single employee.
@@ -109,13 +90,15 @@ module.exports = function(Employees){
         var empId = req.params.number;
           if (isNaN(empId)) res.status(200).json({data: [], message:'Invalid Employee id', status: 200});
         else {
-            EmployeeModel.find({empId: empId}).lean().exec(function(err, Employee) {
+            EmployeeModel.findOne({empId: empId}).lean().exec(function(err, Employee) {
               if (err) throw err;
               
                 if(Employee) {
-                  if(Employee.length > 0) Employee[0].image = getImagePath + Employee[0].image;
-                  res.status(200).json({data: Employee, message: (Employee.length || 'No') +' record found', status: 200});
-                }  
+                  Employee.image = getImagePath + Employee.image;
+                  res.status(200).json({data: Employee, message: '1 record found', status: 200});
+                } else{
+                    res.status(200).json({data: {}, message: 'No record found', status: 200});
+                } 
             });
             
         };
@@ -123,23 +106,15 @@ module.exports = function(Employees){
 
     // D = Delete - This End point delete an employee.
 
-    router.delete('/employees/', function(req, res, next) {
+    router.delete('/employees/:number', function(req, res, next) {
       
-      var empId = req.body.empId;
+      var empId = req.params.number;
           if (isNaN(empId)) res.status(200).json({data: [], message:'Invalid Employee id', status: 200});
         else {
-            EmployeeModel.find({empId: empId}).lean().exec(function(err, Employee) {
-              if (err) throw err;
-               if(Employee.length > 0){
-                    objId = Employee[0]._id;
-                  EmployeeModel.findByIdAndRemove(objId, function (err, Emp) {
-                    if (err)  res.status(200).json({data: {}, message: "Invalid employee id", status: 200});  
-                    if(Emp) res.status(200).json({data: {}, message: "1 Employee deleted", status: 200});
-                    });
-                  }
-                else{
-                    res.status(200).json({data: {}, message: "Employee not found", status: 200});  
-                }    
+            EmployeeModel.findOneAndRemove({empId: empId}, function (err, Employee) {
+                if (err)  throw err;  
+                if(Employee) res.status(200).json({data: {}, message: "Employee deleted", status: 200});
+                else res.status(200).json({data: {}, message: "Employee Not Found", status: 200});
             });
             
         };        
@@ -149,7 +124,55 @@ module.exports = function(Employees){
     /****************************************************************************************************************
     **************************************************** CURD END ***************************************************
     *****************************************************************************************************************/
-     
+     //File Upload
+
+     router.put('/upload/', fileUpload(), function(req, res, next) {
+       
+        var params = JSON.parse(req.body.details);
+        var image = req.files.image; 
+       
+        if(image){
+         
+         // var stream = fs.createReadStream(image.path);
+          var imageName = (params.name + '_' + params.surname + '.' + (image.name).split('.').pop()).toLowerCase();
+          params.image = imageName;
+
+          //AWS Upload Scripts
+
+         /*fsImpl.writeFile(imageName, stream).then(function() {
+            fs.unlink(image.path);	
+            //console.log('It\'s saved!');
+          }, function(reason) {
+            throw reason;
+          });*/
+
+          // Local Upload
+
+         image.mv('D:/ApacheWebroot/nodejs/hra-api/public/uploads/' + imageName, function(err) {
+              if (err) throw err;
+          });
+          
+          var empId = params.empId;
+        
+          if (isNaN(empId)) res.status(200).json({data: [], message:'Invalid Employee id', status: 200});
+          else {
+
+             EmployeeModel.findOneAndUpdate({empId: empId}, { $set: params}, { new: true }, function (err, Employee) {
+                if (err) return handleError(err);
+                if(Employee){
+                  Employee.image = getImagePath + Employee.image;
+                  res.status(200).json({data: Employee, message: 'File uploaded successfully', status: 200}); }
+                else{
+                  res.status(200).json({data: {}, message: 'No record found', status: 200});
+                }  
+            });   
+          };
+
+        }else{
+           res.status(404).json({data: {}, message: 'No image found', status: 404});
+        }
+    });
+
      // Create endpoint handlers for /users  
     router.get('/users/', authController.isAuthenticated, function(req, res, next) {
 
