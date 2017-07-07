@@ -14,7 +14,8 @@ module.exports = function(Employees){
     var oauth2Controller = require('../auth2');
     var router = express.Router();
     var getImagePath = "http://localhost:8080/uploads/"; //'https://s3.amazonaws.com/' + fsImpl.getPath() + '/';
-    var localUploadPath = "C:/xampp/htdocs/mygit/hra-api/public/uploads/";
+    var localUploadPath = "D:/ApacheWebroot/nodejs/hra-api/public/uploads/";
+
     /*****************************************************************************************************************
     ***************************************************** CURD START *************************************************
     ******************************************************************************************************************/
@@ -129,12 +130,13 @@ module.exports = function(Employees){
      router.put('/upload/', fileUpload(), function(req, res, next) {
        
         var params = JSON.parse(req.body.details);
-        var image = req.files.image; 
-       
+        var image = req.files.image;
+        var rand = Math.floor((Math.random() * 100000000000) + 1);
+
         if(image){
          
          // var stream = fs.createReadStream(image.path);
-          var imageName = (params.name + '_' + params.surname + '.' + (image.name).split('.').pop()).toLowerCase();
+          var imageName = (params.name + '_' + params.surname + '_' + rand + '.' + (image.name).split('.').pop()).toLowerCase();
           params.image = imageName;
 
           //AWS Upload Scripts
@@ -150,23 +152,26 @@ module.exports = function(Employees){
 
          image.mv(localUploadPath + imageName, function(err) {
               if (err) throw err;
+              
+              
+            var empId = params.empId;
+          
+            if (isNaN(empId)) res.status(200).json({data: [], message:'Invalid Employee id', status: 200});
+            else {
+
+              EmployeeModel.findOneAndUpdate({empId: empId}, { $set: params}, { new: true }, function (err, Employee) {
+                  if (err) return handleError(err);
+                  if(Employee){
+                    Employee.image = getImagePath + Employee.image;
+                    res.status(200).json({data: Employee, message: 'File uploaded successfully', status: 200}); }
+                  else{
+                    res.status(200).json({data: {}, message: 'No record found', status: 200});
+                  }  
+              });   
+            };
+
           });
           
-          var empId = params.empId;
-        
-          if (isNaN(empId)) res.status(200).json({data: [], message:'Invalid Employee id', status: 200});
-          else {
-
-             EmployeeModel.findOneAndUpdate({empId: empId}, { $set: params}, { new: true }, function (err, Employee) {
-                if (err) return handleError(err);
-                if(Employee){
-                  Employee.image = getImagePath + Employee.image;
-                  res.status(200).json({data: Employee, message: 'File uploaded successfully', status: 200}); }
-                else{
-                  res.status(200).json({data: {}, message: 'No record found', status: 200});
-                }  
-            });   
-          };
 
         }else{
            res.status(404).json({data: {}, message: 'No image found', status: 404});
