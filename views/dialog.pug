@@ -10,7 +10,7 @@ html
       b full access
       |  to your account.
     p Do you approve?
-    form(action='/oauth2/authorize', method='post')
+    form(action='/api/v1/oauth2/authorize', method='post')
       input(name='transaction_id', type='hidden', value='#{transactionID}')
       div
         input#allow(type='submit', value='Allow')

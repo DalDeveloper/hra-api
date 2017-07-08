@@ -1,7 +1,7 @@
 
 module.exports = function(Employees, mongoose){
   var express = require('express');
-  //var session = require('express-session');
+  var session = require('express-session');
   //var MongoStore = require('connect-mongo')(session);
   var MongoStore = require('connect-mongo');
   var path = require('path');
@@ -20,7 +20,7 @@ module.exports = function(Employees, mongoose){
   // view engine setup
   app.set('views', path.join(__dirname, 'views'));
   //app.set('view engine', 'jade');
-  //app.set('view engine', 'pug');
+  app.set('view engine', 'pug');
 
   // uncomment after placing your favicon in /public
   //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
@@ -37,7 +37,12 @@ module.exports = function(Employees, mongoose){
     store: new MongoStore({url: 'mongodb://daadmin:admin123@ds143151.mlab.com:43151/hra'})
   }));
   */
-  
+  // Use express session support since OAuth2orize requires it
+  app.use(session({
+    secret: 'Super Secret Session Key',
+    saveUninitialized: true,
+    resave: true
+  }));
   app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -47,6 +52,7 @@ module.exports = function(Employees, mongoose){
   });
  
   app.use('/api/v1/', api_mongo);
+  //app.use('/api/v1/', api_mssql);
 
   // catch 404 and forward to error handler
   app.use(function(req, res, next) {
