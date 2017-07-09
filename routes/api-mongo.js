@@ -14,7 +14,7 @@ module.exports = function(Employees){
     var oauth2Controller = require('../auth2');
     var router = express.Router();
     var getImagePath = "http://localhost:8080/uploads/"; //'https://s3.amazonaws.com/' + fsImpl.getPath() + '/';
-    var localUploadPath = "D:/ApacheWebroot/nodejs/hra-api/public/uploads/";
+    var localUploadPath = "C:/xampp/htdocs/mygit/hra-api/public/uploads/"; //"D:/ApacheWebroot/nodejs/hra-api/public/uploads/";
 
     /*****************************************************************************************************************
     ***************************************************** CURD START *************************************************
@@ -29,11 +29,11 @@ module.exports = function(Employees){
         if(params._$visited) delete params._$visited; //console.log(params);
         
         params.empId = Math.floor((Math.random() * 1000) + 1);
-        params.image = params.image || ''; 
+        params.image = params.gender + '.jpg'; 
         var Emp = new EmployeeModel(params);
             Emp.save(function(err,Employee) {
               if (err) throw err;
-                //Employee.image = getImagePath + Employee.image;
+                Employee.image = getImagePath + Employee.image;
                 res.json({data: Employee, message:'Employee saved successfully!', status: 200});
             });
     });
@@ -43,6 +43,7 @@ module.exports = function(Employees){
     router.put('/employees/', function(req, res, next) { console.log(req.body);
        var params = req.body; 
        var empId = params.empId;
+       delete params.image;
        if (isNaN(empId)) res.status(200).json({data: [], message:'Invalid Employee id', status: 200});
        else {
          EmployeeModel.findOneAndUpdate({empId: empId}, { $set: params}, { new: true }, function (err, Employee) {
@@ -190,15 +191,15 @@ module.exports = function(Employees){
 
     // Create endpoint handlers for /users  
     router.post('/users/', function(req, res, next) {
-
+      
        var User = new UserModel({
         username: req.body.username,
         password: req.body.password
       });
-
+    
       User.save(function(err) {
         if (err)
-          res.send(err);
+         { return res.send(err); }
 
         res.json({ message: 'New user added!' });
       });
@@ -207,19 +208,19 @@ module.exports = function(Employees){
 
 
     router.post('/clients/', authController.isAuthenticated, function(req, res, next) {
-
+      
       // Set the client properties that came from the POST data
-      var client = new ClientModel();
+      var client = new ClientModel({
+        name: req.body.name,
+        id: req.body.id,
+        secret: req.body.secret,
+        userId: req.user._id
+      });
         
-      client.name = req.body.name;
-      client.id = req.body.id;
-      client.secret = req.body.secret;
-      client.userId = req.user._id;
-
       // Save the client and check for errors
       client.save(function(err) {
         if (err)
-          res.send(err);
+          { return res.send(err);}
 
         res.json({ message: 'Client added!', data: client });
       });

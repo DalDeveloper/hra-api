@@ -71,6 +71,8 @@ server.exchange(oauth2orize.exchange.code(function(client, code, redirectUri, ca
 }));
 
 
+
+
 // User authorization endpoint
 exports.authorization = [
   server.authorization(function(clientId, redirectUri, callback) {
@@ -81,7 +83,7 @@ exports.authorization = [
       return callback(null, client, redirectUri);
     });
   }),
-  function(req, res){
+  function(req, res){ console.log(req.oauth2);
     res.render('dialog', { transactionID: req.oauth2.transactionID, user: req.user, client: req.oauth2.client });
   }
 ]
