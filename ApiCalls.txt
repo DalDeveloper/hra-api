@@ -1,4 +1,0 @@
-GET http://api.nodejs.goal.com:8080/employees/list/type/0
-POST http://api.nodejs.goal.com:8080/employees/add
-PUT http://api.nodejs.goal.com:8080/employees/update/
-DELETE http://api.nodejs.goal.com:8080/employees/delete/

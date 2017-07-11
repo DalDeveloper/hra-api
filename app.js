@@ -12,7 +12,7 @@ module.exports = function(Employees, mongoose){
   var Employees1 = {};
   var index = require('./routes/index')(Employees);
   var api_mongo = require('./routes/api-mongo')(Employees);
-  //var api_mssql = require('./routes/api-mssql')(Employees);
+  var api_mssql = require('./routes/api-mssql')();
   //var apiRoutes = require('./routes/api');
 
   var app = express();
@@ -52,8 +52,8 @@ module.exports = function(Employees, mongoose){
   });
  
   app.use('/api/v1/', api_mongo);
-  //app.use('/api/v1/', api_mssql);
-
+  app.use('/api/v2/', api_mssql);
+  
   // catch 404 and forward to error handler
   app.use(function(req, res, next) {
     var err = new Error('Not Found');

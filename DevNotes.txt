@@ -1,5 +1,48 @@
+Domain: http://api.nodejs.goal.com:8080/
+
 Get http://localhost:8080/api/v1/employees --- all employees
 Post http://localhost:8080/api/v1/employees --- add employee
 Get http://localhost:8080/api/v1/employees/id --- single employee
 Put http://localhost:8080/api/v1/employees/id --- update single employee
 Delete http://localhost:8080/api/v1/employees/id --- delete single employee
+
+
+AUTH
+=====
+
+http://localhost:8080/api/v1/users
+http://localhost:8080/api/v1/clients
+{
+    "message": "Client added!",
+    "data": {
+        "__v": 0,
+        "name": "My  Node Project",
+        "id": "1099",
+        "secret": "XARETY23GFR345",
+        "userId": "59623128bd8ffd458421c90c",
+        "_id": "5962380219318e83d4e10c11"
+    }
+}
+
+http://localhost:8080/api/v1/oauth2/authorize?client_id=1099&response_type=code&redirect_uri=http://localhost:4200/tables
+
+https://github.com/FrankHassanabad/Oauth2orizeRecipes
+
+http://localhost:8080/api/v1/oauth2/token
+
+code: 7bOVRqX6sf7H6pyj
+grant_type:authorization.code
+reditect_uri: http://localhost:4200/tables
+{
+    "access_token": {
+        "__v": 0,
+        "value": "MrnmWOBt63qz45ZEB6WO02OOcbfsPtGv18RvgUBLvZhvRuchuHEJlet3aHxklX5tjwZNKs58lDynJbxwOSpf19aUVqcrsVF5yucVQ2AmyH4pDbIWOFHfjub4vNOhGBprmm6EXSCjyQWWyMhsodJTpZkp0bgcjaXDmRUqv1AhxrhTXbvlGhuKJE5dFyq8sIXRfDA15CvJ7jbTOKvESu6nIfmEGLoEpG5Uhf8seUnr3LlodCDlXA8lN48cWjb1Kext",
+        "clientId": "5962380219318e83d4e10c11",
+        "userId": "59623133bd8ffd458421c90d",
+        "_id": "596242b20b617281c0f67b39"
+    },
+    "token_type": "Bearer"
+} 
+
+
+Bearer MrnmWOBt63qz45ZEB6WO02OOcbfsPtGv18RvgUBLvZhvRuchuHEJlet3aHxklX5tjwZNKs58lDynJbxwOSpf19aUVqcrsVF5yucVQ2AmyH4pDbIWOFHfjub4vNOhGBprmm6EXSCjyQWWyMhsodJTpZkp0bgcjaXDmRUqv1AhxrhTXbvlGhuKJE5dFyq8sIXRfDA15CvJ7jbTOKvESu6nIfmEGLoEpG5Uhf8seUnr3LlodCDlXA8lN48cWjb1Kext

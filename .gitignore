@@ -2,3 +2,4 @@
 aws.js
 db.js
 /public/uploads
+msdb.js

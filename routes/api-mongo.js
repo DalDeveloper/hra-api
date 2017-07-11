@@ -14,7 +14,7 @@ module.exports = function(Employees){
     var oauth2Controller = require('../auth2');
     var router = express.Router();
     var getImagePath = "http://localhost:8080/uploads/"; //'https://s3.amazonaws.com/' + fsImpl.getPath() + '/';
-    var localUploadPath = "C:/xampp/htdocs/mygit/hra-api/public/uploads/"; //"D:/ApacheWebroot/nodejs/hra-api/public/uploads/";
+    var localUploadPath = "D:/ApacheWebroot/nodejs/hra-api/public/uploads/"; //"C:/xampp/htdocs/mygit/hra-api/public/uploads/";
 
     /*****************************************************************************************************************
     ***************************************************** CURD START *************************************************
